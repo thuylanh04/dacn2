@@ -11,7 +11,8 @@ class CreateAccountScreen extends ConsumerStatefulWidget {
   const CreateAccountScreen({Key? key}) : super(key: key);
 
   @override
-  ConsumerState<CreateAccountScreen> createState() => _CreateAccountScreenState();
+  ConsumerState<CreateAccountScreen> createState() =>
+      _CreateAccountScreenState();
 }
 
 class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
@@ -187,7 +188,8 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                       isPassword: true,
                       showPassword: _showConfirmPassword,
                       onShowPasswordToggle: () {
-                        setState(() => _showConfirmPassword = !_showConfirmPassword);
+                        setState(
+                            () => _showConfirmPassword = !_showConfirmPassword);
                       },
                       validator: (value) {
                         if (value?.isEmpty ?? true) {
