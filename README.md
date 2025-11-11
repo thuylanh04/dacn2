@@ -22,7 +22,8 @@ samples, guidance on mobile development, and a full API reference.
 ![signup](image-5.png)
 ![forgot-password](image-6.png)
 ![home](image-7.png)
-
+![profile](image-8.png)
+![edit-profile](image-9.png)
 
 
 

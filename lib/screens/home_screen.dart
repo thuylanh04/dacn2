@@ -396,9 +396,32 @@ class _BottomNavBar extends StatefulWidget {
   @override
   State<_BottomNavBar> createState() => _BottomNavBarState();
 }
-
 class _BottomNavBarState extends State<_BottomNavBar> {
   int _selectedIndex = 0;
+
+  void _onItemTapped(int index) {
+    if (index == 4) {
+      // Route sang trang Profile bằng GoRouter
+      context.go('/profile');
+    } else {
+      setState(() => _selectedIndex = index);
+      // Có thể route sang các trang khác nếu muốn
+      switch (index) {
+        case 0:
+          context.go('/home');
+          break;
+        case 1:
+          context.go('/stats');
+          break;
+        case 2:
+          context.go('/transactions');
+          break;
+        case 3:
+          context.go('/goals');
+          break;
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -415,7 +438,7 @@ class _BottomNavBarState extends State<_BottomNavBar> {
       ),
       child: BottomNavigationBar(
         currentIndex: _selectedIndex,
-        onTap: (index) => setState(() => _selectedIndex = index),
+        onTap: _onItemTapped,
         backgroundColor: AppColors.surface,
         elevation: 0,
         type: BottomNavigationBarType.fixed,
