@@ -399,32 +399,43 @@ class _BottomNavBar extends StatefulWidget {
 class _BottomNavBarState extends State<_BottomNavBar> {
   int _selectedIndex = 0;
 
+  // Robust mapping: dùng startsWith để bắt cả /transactions, /transactions/, /transactions/123, v.v.
+  int _getCurrentIndex(BuildContext context) {
+    final location = GoRouterState.of(context).uri.toString();
+// current location
+    if (location.startsWith('/home')) return 0;
+    if (location.startsWith('/stats')) return 1;
+    // if (location.startsWith('/transactions')) return 2;
+    if (location.startsWith('/goals')) return 3;
+    if (location.startsWith('/profile')) return 2;
+    return 0;
+  }
+
   void _onItemTapped(int index) {
-    if (index == 4) {
-      // Route sang trang Profile bằng GoRouter
-      context.go('/profile');
-    } else {
-      setState(() => _selectedIndex = index);
-      // Có thể route sang các trang khác nếu muốn
-      switch (index) {
-        case 0:
-          context.go('/home');
-          break;
-        case 1:
-          context.go('/stats');
-          break;
-        case 2:
-          context.go('/transactions');
-          break;
-        case 3:
-          context.go('/goals');
-          break;
-      }
+    setState(() => _selectedIndex = index);
+
+    switch (index) {
+      case 0:
+        context.go('/home');
+        break;
+      case 1:
+        context.go('/stats');
+        break;
+      case 2:
+        context.go('/transactions');
+        break;
+      case 3:
+        context.go('/goals');
+        break;
+      case 4:
+        context.go('/profile');
+        break;
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final currentIndex = _getCurrentIndex(context);
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surface,
@@ -437,32 +448,17 @@ class _BottomNavBarState extends State<_BottomNavBar> {
         ],
       ),
       child: BottomNavigationBar(
-        currentIndex: _selectedIndex,
+        currentIndex: currentIndex,
         onTap: _onItemTapped,
         backgroundColor: AppColors.surface,
         elevation: 0,
         type: BottomNavigationBarType.fixed,
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_rounded),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.bar_chart_rounded),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.compare_arrows_rounded),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.layers_rounded),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_rounded),
-            label: '',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home_rounded), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.bar_chart_rounded), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.compare_arrows_rounded), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.layers_rounded), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.person_rounded), label: ''),
         ],
         selectedItemColor: AppColors.primary,
         unselectedItemColor: AppColors.textMuted,
