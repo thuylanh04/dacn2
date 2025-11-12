@@ -24,6 +24,7 @@ samples, guidance on mobile development, and a full API reference.
 ![home](image-7.png)
 ![profile](image-8.png)
 ![edit-profile](image-9.png)
-
+![analysis](image-10.png)
+![transaction](image-11.png)
 
 

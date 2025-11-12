@@ -9,8 +9,10 @@ import 'screens/forgot_password_screen.dart';
 import 'screens/home_screen.dart';
 import 'constants/colors.dart';
 import 'providers/app_state_provider.dart';
-import 'screens/profile_screen.dart';
+import 'screens/quick_analysis_screen.dart';
+import 'screens/categories_screen.dart';
 import 'screens/transaction_screen.dart';
+import 'screens/profile_screen.dart';
 
 void main() {
   runApp(const ProviderScope(child: FinWiseApp()));
@@ -49,13 +51,11 @@ class FinWiseApp extends ConsumerWidget {
 
         // appStatus == home
         if (appState.appStatus == AppStatus.home) {
-          // if (location != '/home') return '/home';
-          // return null;
           // Allow navigation to home and other post-auth screens
           const allowedHome = [
             '/home',
-            // '/quick-analysis',
-            // '/categories',
+            '/quick-analysis',
+            '/categories',
             '/transaction',
             '/profile',
           ];
@@ -91,12 +91,20 @@ class FinWiseApp extends ConsumerWidget {
           builder: (context, state) => const HomeScreen(),
         ),
         GoRoute(
-          path: '/profile',
-          builder: (context, state) => const ProfileScreen(),
+          path: '/quick-analysis',
+          builder: (context, state) => const QuickAnalysisScreen(),
+        ),
+        GoRoute(
+          path: '/categories',
+          builder: (context, state) => const CategoriesScreen(),
         ),
         GoRoute(
           path: '/transaction',
           builder: (context, state) => const TransactionScreen(),
+        ),
+        GoRoute(
+          path: '/profile',
+          builder: (context, state) => const ProfileScreen(),
         ),
       ],
     );

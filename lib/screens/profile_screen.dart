@@ -24,7 +24,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 children: [
                   IconButton(
                     icon: const Icon(Icons.arrow_back),
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: () {},
                     color: Colors.black,
                   ),
                   Text(
