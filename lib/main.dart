@@ -13,6 +13,7 @@ import 'screens/quick_analysis_screen.dart';
 import 'screens/categories_screen.dart';
 import 'screens/transaction_screen.dart';
 import 'screens/profile_screen.dart';
+import 'screens/main_layout.dart';
 
 void main() {
   runApp(const ProviderScope(child: FinWiseApp()));
@@ -88,23 +89,23 @@ class FinWiseApp extends ConsumerWidget {
         ),
         GoRoute(
           path: '/home',
-          builder: (context, state) => const HomeScreen(),
+          builder: (context, state) => const MainLayout(initialIndex: 0),
         ),
         GoRoute(
           path: '/quick-analysis',
-          builder: (context, state) => const QuickAnalysisScreen(),
-        ),
-        GoRoute(
-          path: '/categories',
-          builder: (context, state) => const CategoriesScreen(),
+          builder: (context, state) => const MainLayout(initialIndex: 1),
         ),
         GoRoute(
           path: '/transaction',
-          builder: (context, state) => const TransactionScreen(),
+          builder: (context, state) => const MainLayout(initialIndex: 2),
+        ),
+        GoRoute(
+          path: '/categories',
+          builder: (context, state) => const MainLayout(initialIndex: 3),
         ),
         GoRoute(
           path: '/profile',
-          builder: (context, state) => const ProfileScreen(),
+          builder: (context, state) => const MainLayout(initialIndex: 4),
         ),
       ],
     );

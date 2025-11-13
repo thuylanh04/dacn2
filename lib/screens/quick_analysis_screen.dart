@@ -7,6 +7,7 @@ class QuickAnalysisScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final canPop = Navigator.of(context).canPop();
     return Scaffold(
       backgroundColor: const Color(0xFF1FD4A1),
       body: SafeArea(
@@ -17,11 +18,13 @@ class QuickAnalysisScreen extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back),
-                    onPressed: () {},
-                    color: Colors.black,
-                  ),
+                  canPop
+                      ? IconButton(
+                          icon: const Icon(Icons.arrow_back),
+                          onPressed: () => Navigator.of(context).pop(),
+                          color: Colors.black,
+                        )
+                      : const SizedBox(width: 48),
                   const Text(
                     'Quickly Analysis',
                     style: TextStyle(

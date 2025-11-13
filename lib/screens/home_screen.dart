@@ -138,7 +138,6 @@ class HomeScreen extends ConsumerWidget {
           ),
         ],
       ),
-      bottomNavigationBar: _BottomNavBar(),
     );
   }
 }
@@ -392,63 +391,4 @@ class _TimeFilterButtonsState extends State<_TimeFilterButtons> {
   }
 }
 
-class _BottomNavBar extends StatefulWidget {
-  @override
-  State<_BottomNavBar> createState() => _BottomNavBarState();
-}
-
-class _BottomNavBarState extends State<_BottomNavBar> {
-  int _selectedIndex = 0;
-  @override
-  Widget build(BuildContext context) {
-    final currentIndex = _selectedIndex;
-
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, -5),
-          ),
-        ],
-      ),
-      child: BottomNavigationBar(
-        currentIndex: currentIndex,
-        onTap: (index) {
-          setState(() => _selectedIndex = index);
-          switch (index) {
-            case 0:
-              context.go('/home');
-              break;
-            case 1:
-              context.go('/quick-analysis');
-              break;
-            case 2:
-              context.go('/transaction');
-              break;
-            case 3:
-              context.go('/categories');
-              break;
-            case 4:
-              context.go('/profile');
-              break;
-          }
-        },
-        backgroundColor: AppColors.surface,
-        elevation: 0,
-        type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home_rounded), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.bar_chart_rounded), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.compare_arrows_rounded), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.layers_rounded), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.person_rounded), label: ''),
-        ],
-        selectedItemColor: AppColors.primary,
-        unselectedItemColor: AppColors.textMuted,
-      ),
-    );
-  }
-}
+// BottomNavigationBar is provided by MainLayout; removed here.
