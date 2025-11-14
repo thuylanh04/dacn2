@@ -26,5 +26,7 @@ samples, guidance on mobile development, and a full API reference.
 ![edit-profile](image-9.png)
 ![analysis](image-10.png)
 ![transaction](image-11.png)
-
+![categories](image-12.png)
+![category item](image-13.png)
+![add new category](image-14.png)
 
