@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
-// import '../widgets/category_card.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/categories_provider.dart';
+import '../models/category.dart' as model;
+import '../utils/icon_mapper.dart';
+import '../utils/color_utils.dart';
+import 'category_detail_screen.dart';
 import 'category_card.dart';
 
-class CategoriesScreen extends StatelessWidget {
+class CategoriesScreen extends ConsumerWidget {
   const CategoriesScreen({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final asyncCategories = ref.watch(categoriesProvider);
     final canPop = Navigator.of(context).canPop();
     return Scaffold(
       backgroundColor: const Color(0xFF1FD4A1),
@@ -120,31 +126,56 @@ class CategoriesScreen extends StatelessWidget {
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(20),
-                  child: GridView.builder(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      mainAxisSpacing: 16,
-                      crossAxisSpacing: 16,
+                  child: asyncCategories.when(
+                    data: (list) => RefreshIndicator(
+                      onRefresh: () async => ref.refresh(categoriesProvider.future),
+                      child: GridView.builder(
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          mainAxisSpacing: 16,
+                          crossAxisSpacing: 16,
+                        ),
+                        itemCount: list.length,
+                        itemBuilder: (context, index) {
+                          final model.Category cat = list[index];
+                          final icon = iconFromName(cat.icon);
+                          final color = colorFromHex(cat.color);
+                          return CategoryCard(
+                            label: cat.name,
+                            icon: icon,
+                            color: color,
+                            onTap: () {
+                              if (cat.name.toLowerCase() == 'more') {
+                                _showAddCategoryDialog(context);
+                              } else {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (_) => CategoryDetailScreen(
+                                      categoryId: cat.id,
+                                      categoryName: cat.name,
+                                    ),
+                                  ),
+                                );
+                              }
+                            },
+                          );
+                        },
+                      ),
                     ),
-                    itemCount: 9,
-                    itemBuilder: (context, index) {
-                      final categories = [
-                        ('Food', Icons.restaurant, const Color(0xFF2E5BFF)),
-                        ('Transport', Icons.directions_bus, const Color(0xFF5E9CFF)),
-                        ('Medicine', Icons.local_pharmacy, const Color(0xFF5E9CFF)),
-                        ('Groceries', Icons.shopping_bag, const Color(0xFF5E9CFF)),
-                        ('Rent', Icons.handshake, const Color(0xFF5E9CFF)),
-                        ('Gifts', Icons.card_giftcard, const Color(0xFF5E9CFF)),
-                        ('Savings', Icons.account_balance, const Color(0xFF5E9CFF)),
-                        ('Entertainment', Icons.video_library, const Color(0xFF5E9CFF)),
-                        ('More', Icons.add, const Color(0xFF5E9CFF)),
-                      ];
-                      return CategoryCard(
-                        label: categories[index].$1,
-                        icon: categories[index].$2,
-                        color: categories[index].$3,
-                      );
-                    },
+                    loading: () => const Center(child: CircularProgressIndicator()),
+                    error: (e, _) => Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text('Failed to load categories: $e', textAlign: TextAlign.center),
+                          const SizedBox(height: 12),
+                          ElevatedButton(
+                            onPressed: () => ref.refresh(categoriesProvider),
+                            child: const Text('Retry'),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -189,4 +220,85 @@ class CategoriesScreen extends StatelessWidget {
       ],
     );
   }
+}
+
+void _showAddCategoryDialog(BuildContext context) {
+  const primary = Color(0xFF14C996);
+  final controller = TextEditingController();
+  showDialog(
+    context: context,
+    barrierDismissible: true,
+    builder: (ctx) {
+      return Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 4),
+              const Text(
+                'New Category',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Container(
+                decoration: BoxDecoration(
+                  color: Color(0xFFE8F5F0),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: TextField(
+                  controller: controller,
+                  decoration: const InputDecoration(
+                    hintText: 'Write...',
+                    hintStyle: TextStyle(color: primary, fontSize: 14),
+                    border: InputBorder.none,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(ctx).pop();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Saved "${controller.text.trim()}" (mock)'), behavior: SnackBarBehavior.floating),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: primary,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                  ),
+                  child: const Text(
+                    'Save',
+                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton(
+                  onPressed: () => Navigator.of(ctx).pop(),
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide.none,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                  ),
+                  child: const Text('Cancel', style: TextStyle(color: Colors.black)),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
 }

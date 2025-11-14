@@ -26,7 +26,7 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController _usernameController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   var _usernameErrorText = "Username invalid";
-  var _passwordErrorText = "Password must be at least 6 characters";
+  var _passwordErrorText = "Password must be at least 3 characters";
   var _userInvalid = false;
   var _passwordInvalid = false;
 
@@ -169,7 +169,7 @@ class _LoginPageState extends State<LoginPage> {
         _userInvalid = false;
       }
 
-      if (_passwordController.text.length < 6) {
+      if (_passwordController.text.length < 3) {
         _passwordInvalid = true;
       } else {
         _passwordInvalid = false;

@@ -14,6 +14,8 @@ import 'screens/categories_screen.dart';
 import 'screens/transaction_screen.dart';
 import 'screens/profile_screen.dart';
 import 'screens/main_layout.dart';
+import 'screens/transport_category_screen.dart';
+import 'screens/add_expenses_screen.dart';
 
 void main() {
   runApp(const ProviderScope(child: FinWiseApp()));
@@ -59,6 +61,8 @@ class FinWiseApp extends ConsumerWidget {
             '/categories',
             '/transaction',
             '/profile',
+            '/transport',
+            '/add-expense',
           ];
           if (allowedHome.contains(location)) return null;
           return '/home';
@@ -107,6 +111,14 @@ class FinWiseApp extends ConsumerWidget {
           path: '/profile',
           builder: (context, state) => const MainLayout(initialIndex: 4),
         ),
+        GoRoute(
+          path: '/transport',
+          builder: (context, state) => const TransportCategoryScreen(),
+        ),
+        GoRoute(
+          path: '/add-expense',
+          builder: (context, state) => const AddExpensesScreen(),
+        ),
       ],
     );
 
@@ -118,6 +130,7 @@ class FinWiseApp extends ConsumerWidget {
           seedColor: AppColors.primary,
           brightness: Brightness.light,
         ),
+        scaffoldBackgroundColor: const Color(0xFFF5F5F5),
       ),
       routerConfig: router,
     );

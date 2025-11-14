@@ -174,8 +174,8 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                         if (value?.isEmpty ?? true) {
                           return 'Password is required';
                         }
-                        if ((value?.length ?? 0) < 6) {
-                          return 'Password must be at least 6 characters';
+                        if ((value?.length ?? 0) < 3) {
+                          return 'Password must be at least 3 characters';
                         }
                         return null;
                       },

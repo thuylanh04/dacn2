@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../constants/colors.dart';
 import 'home_screen.dart';
 import 'quick_analysis_screen.dart';
 import 'transaction_screen.dart';
@@ -46,7 +45,7 @@ class _MainLayoutState extends State<MainLayout> {
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: const Color(0xFFF5F5F5),
         body: IndexedStack(
           index: _currentIndex,
           children: [
@@ -71,33 +70,27 @@ class _MainLayoutState extends State<MainLayout> {
 
   Widget _buildBottomNav(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, -5),
-          ),
-        ],
+      decoration: const BoxDecoration(
+        color: Color(0xFFE8F5F0),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) {
           setState(() => _currentIndex = index);
         },
-        backgroundColor: AppColors.surface,
+        backgroundColor: Colors.transparent,
         elevation: 0,
         type: BottomNavigationBarType.fixed,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home_rounded), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.bar_chart_rounded), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.compare_arrows_rounded), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.layers_rounded), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.person_rounded), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.home_outlined), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.bar_chart_outlined), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.compare_arrows_outlined), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.layers_outlined), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: ''),
         ],
-        selectedItemColor: AppColors.primary,
-        unselectedItemColor: AppColors.textMuted,
+        selectedItemColor: Color(0xFF14C996),
+        unselectedItemColor: Color(0xFFBDBDBD),
       ),
     );
   }
