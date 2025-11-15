@@ -29,4 +29,5 @@ samples, guidance on mobile development, and a full API reference.
 ![categories](image-12.png)
 ![category item](image-13.png)
 ![add new category](image-14.png)
-
+![security](image-15.png)
+![settings](image-16.png)
