@@ -13,7 +13,7 @@ class AuthRepository {
     return user;
   }
 
-  Future<void> signup(String name, String email, String password) async {
-    await _api.signup(name: name, email: email, password: password);
+  Future<void> signup(String username, String dob, String password) async {
+    await _api.signup(username: username, dob: dob, password: password);
   }
 }

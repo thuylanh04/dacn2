@@ -124,6 +124,7 @@ class FinWiseApp extends ConsumerWidget {
 
     return MaterialApp.router(
       title: 'FinWise',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(

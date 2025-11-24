@@ -1,19 +1,18 @@
 // Service: ApiService
 // Centralized HTTP client, token handling and endpoints.
 
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
 import '../models/user.dart';
 import '../models/category.dart';
 import '../models/transaction.dart';
 
 class ApiService {
-  ApiService({http.Client? client, String? baseUrl, bool mock = true})
-      : _client = client ?? http.Client(),
-        _baseUrl = baseUrl ?? 'https://api.example.com',
-        _mock = mock;
+  ApiService({Dio? dio, String? baseUrl, bool mock = true})
+      : _baseUrl = baseUrl ?? 'https://a63f923336f4.ngrok-free.app',
+        _mock = mock,
+        _dio = dio ?? Dio(BaseOptions(baseUrl: baseUrl ?? 'https://a63f923336f4.ngrok-free.app'));
 
-  final http.Client _client;
+  final Dio _dio;
   final String _baseUrl;
   final bool _mock;
 
@@ -36,32 +35,43 @@ class ApiService {
       _token = token;
       return User.fromJson({'id': 1, 'name': 'Mock User', 'email': email}, token: token);
     }
-    final res = await _client.post(
-      Uri.parse('$_baseUrl/auth/login'),
-      headers: _headers(withAuth: false),
-      body: jsonEncode({'email': email, 'password': password}),
+    final res = await _dio.post(
+      '/authen',
+      data: {
+        'username': email,
+        'password': password,
+      },
+      options: Options(headers: _headers(withAuth: false)),
     );
-    if (res.statusCode >= 200 && res.statusCode < 300) {
-      final data = jsonDecode(res.body) as Map<String, dynamic>;
-      final token = data['token'] as String? ?? '';
+    if (res.statusCode != null && res.statusCode! >= 200 && res.statusCode! < 300) {
+      final body = res.data;
+      if (body is Map<String, dynamic>) {
+        final token = body['token'] as String? ?? '';
+        _token = token;
+        final userJson = body['user'] is Map<String, dynamic>
+            ? body['user'] as Map<String, dynamic>
+            : body;
+        return User.fromJson(userJson, token: token);
+      }
+      // Fallback: construct a minimal user
+      final token = '';
       _token = token;
-      final user = User.fromJson(data['user'] as Map<String, dynamic>, token: token);
-      return user;
+      return User.fromJson({'id': 0, 'name': '', 'email': email}, token: token);
     }
     throw Exception(_extractError(res));
   }
 
-  Future<void> signup({required String name, required String email, required String password}) async {
+  Future<void> signup({required String username, required String dob, required String password}) async {
     if (_mock) {
       await Future.delayed(const Duration(milliseconds: 400));
       return;
     }
-    final res = await _client.post(
-      Uri.parse('$_baseUrl/auth/signup'),
-      headers: _headers(withAuth: false),
-      body: jsonEncode({'name': name, 'email': email, 'password': password}),
+    final res = await _dio.post(
+      '/api/v1/users/signup',
+      data: {'username': username, 'dob': dob, 'password': password},
+      options: Options(headers: _headers(withAuth: false)),
     );
-    if (res.statusCode < 200 || res.statusCode >= 300) {
+    if (res.statusCode == null || res.statusCode! < 200 || res.statusCode! >= 300) {
       throw Exception(_extractError(res));
     }
   }
@@ -128,12 +138,12 @@ class ApiService {
       ];
       return mock.map((e) => Category.fromJson(e)).toList();
     }
-    final res = await _client.get(
-      Uri.parse('$_baseUrl/categories'),
-      headers: _headers(),
+    final res = await _dio.get(
+      '$_baseUrl/categories',
+      options: Options(headers: _headers()),
     );
-    if (res.statusCode >= 200 && res.statusCode < 300) {
-      final body = jsonDecode(res.body);
+    if (res.statusCode != null && res.statusCode! >= 200 && res.statusCode! < 300) {
+      final body = res.data;
       if (body is List) {
         return body.map((e) => Category.fromJson(e as Map<String, dynamic>)).toList();
       }
@@ -168,14 +178,18 @@ class ApiService {
       ];
       return list.map((e) => TransactionModel.fromJson(e)).toList();
     }
-    final res = await _client.get(
-      Uri.parse('$_baseUrl/transactions'),
-      headers: _headers(),
+    final res = await _dio.get(
+      '$_baseUrl/transactions',
+      options: Options(headers: _headers()),
     );
-    if (res.statusCode >= 200 && res.statusCode < 300) {
-      final body = jsonDecode(res.body);
-      final list = body is List ? body : (body is Map && body['data'] is List ? body['data'] : []);
-      return (list as List).map((e) => TransactionModel.fromJson(e as Map<String, dynamic>)).toList();
+    if (res.statusCode != null && res.statusCode! >= 200 && res.statusCode! < 300) {
+      final body = res.data;
+      final list = body is List
+          ? body
+          : (body is Map && body['data'] is List ? body['data'] : []);
+      return (list as List)
+          .map((e) => TransactionModel.fromJson(e as Map<String, dynamic>))
+          .toList();
     }
     throw Exception(_extractError(res));
   }
@@ -185,22 +199,23 @@ class ApiService {
       await Future.delayed(const Duration(milliseconds: 300));
       return;
     }
-    final res = await _client.post(
-      Uri.parse('$_baseUrl/transactions'),
-      headers: _headers(),
-      body: jsonEncode(tx.toJson()),
+    final res = await _dio.post(
+      '$_baseUrl/transactions',
+      data: tx.toJson(),
+      options: Options(headers: _headers()),
     );
-    if (res.statusCode < 200 || res.statusCode >= 300) {
+    if (res.statusCode == null || res.statusCode! < 200 || res.statusCode! >= 300) {
       throw Exception(_extractError(res));
     }
   }
 
-  String _extractError(http.Response res) {
+  String _extractError(Response res) {
     try {
-      final body = jsonDecode(res.body);
+      final body = res.data;
       if (body is Map && body['message'] is String) return body['message'] as String;
       if (body is Map && body['error'] is String) return body['error'] as String;
     } catch (_) {}
-    return 'HTTP ${res.statusCode}';
+    final code = res.statusCode;
+    return 'HTTP ${code ?? 'unknown'}';
   }
 }

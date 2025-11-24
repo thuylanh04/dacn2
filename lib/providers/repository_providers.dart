@@ -9,7 +9,10 @@ import '../repositories/transport_repository.dart';
 
 final apiServiceProvider = Provider<ApiService>((ref) {
   // In the future, inject baseUrl/mock via env/config
-  return ApiService(mock: true);
+  return ApiService(
+    mock: false,
+    baseUrl: 'https://a63f923336f4.ngrok-free.app',
+  );
 });
 
 final authRepositoryProvider = Provider<AuthRepository>((ref) {

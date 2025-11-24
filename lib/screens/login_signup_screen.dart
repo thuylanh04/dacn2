@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../constants/colors.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/custom_text_field.dart';
+import '../providers/auth_provider.dart';
+import '../providers/app_state_provider.dart';
 
-class LoginSignupScreen extends StatefulWidget {
+class LoginSignupScreen extends ConsumerStatefulWidget {
   final bool showLoginForm;
 
   const LoginSignupScreen({
@@ -13,10 +16,10 @@ class LoginSignupScreen extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<LoginSignupScreen> createState() => _LoginSignupScreenState();
+  ConsumerState<LoginSignupScreen> createState() => _LoginSignupScreenState();
 }
 
-class _LoginSignupScreenState extends State<LoginSignupScreen> {
+class _LoginSignupScreenState extends ConsumerState<LoginSignupScreen> {
   late bool _showLoginForm;
   late TextEditingController _emailController;
   late TextEditingController _passwordController;
@@ -192,8 +195,18 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                   const SizedBox(height: 30),
                   CustomButton(
                     label: 'Log In',
-                    onPressed: () {
-                      context.go('/home');
+                    onPressed: () async {
+                      await ref.read(authProvider.notifier).login(
+                            _emailController.text,
+                            _passwordController.text,
+                          );
+                      final authState = ref.read(authProvider);
+                      if (authState.error == null) {
+                        ref.read(appStateProvider.notifier).setLoggedIn(true);
+                        if (mounted) {
+                          context.go('/home');
+                        }
+                      }
                     },
                     isPrimary: true,
                   ),

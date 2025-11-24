@@ -17,54 +17,38 @@ class CreateAccountScreen extends ConsumerStatefulWidget {
 
 class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
   final _formKey = GlobalKey<FormState>();
-  late TextEditingController _fullNameController;
   late TextEditingController _emailController;
-  late TextEditingController _phoneController;
   late TextEditingController _dobController;
   late TextEditingController _passwordController;
-  late TextEditingController _confirmPasswordController;
 
   bool _showPassword = false;
-  bool _showConfirmPassword = false;
 
   @override
   void initState() {
     super.initState();
-    _fullNameController = TextEditingController();
     _emailController = TextEditingController();
-    _phoneController = TextEditingController();
     _dobController = TextEditingController();
     _passwordController = TextEditingController();
-    _confirmPasswordController = TextEditingController();
   }
 
   @override
   void dispose() {
-    _fullNameController.dispose();
     _emailController.dispose();
-    _phoneController.dispose();
     _dobController.dispose();
     _passwordController.dispose();
-    _confirmPasswordController.dispose();
     super.dispose();
   }
 
-  void _signup() {
+  Future<void> _signup() async {
     if (_formKey.currentState!.validate()) {
-      ref.read(authProvider.notifier).signup(
-            _fullNameController.text,
+      await ref.read(authProvider.notifier).signup(
             _emailController.text,
-            _phoneController.text,
             _dobController.text,
             _passwordController.text,
           );
-      ref.read(appStateProvider.notifier).setLoggedIn(true);
-      // Ensure we navigate to home immediately so the URL and UI update
-      // (avoids the case where the router redirect doesn't replace the
-      // current stack and leaves a /login fragment in the URL).
-      if (mounted) {
-        // Use go to replace location with /home
-        context.go('/home');
+      final authState = ref.read(authProvider);
+      if (authState.error == null && mounted) {
+        context.go('/login');
       }
     }
   }
@@ -109,18 +93,6 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     CustomTextField(
-                      label: 'Full Name',
-                      hintText: 'John Doe',
-                      controller: _fullNameController,
-                      validator: (value) {
-                        if (value?.isEmpty ?? true) {
-                          return 'Full Name is required';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 15),
-                    CustomTextField(
                       label: 'Email',
                       hintText: 'example@example.com',
                       controller: _emailController,
@@ -131,19 +103,6 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                         }
                         if (!value!.contains('@')) {
                           return 'Enter a valid email';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 15),
-                    CustomTextField(
-                      label: 'Mobile Number',
-                      hintText: '+ 123 456 789',
-                      controller: _phoneController,
-                      keyboardType: TextInputType.phone,
-                      validator: (value) {
-                        if (value?.isEmpty ?? true) {
-                          return 'Mobile Number is required';
                         }
                         return null;
                       },
@@ -176,27 +135,6 @@ class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
                         }
                         if ((value?.length ?? 0) < 3) {
                           return 'Password must be at least 3 characters';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 15),
-                    CustomTextField(
-                      label: 'Confirm Password',
-                      hintText: 'Confirm your password',
-                      controller: _confirmPasswordController,
-                      isPassword: true,
-                      showPassword: _showConfirmPassword,
-                      onShowPasswordToggle: () {
-                        setState(
-                            () => _showConfirmPassword = !_showConfirmPassword);
-                      },
-                      validator: (value) {
-                        if (value?.isEmpty ?? true) {
-                          return 'Confirm Password is required';
-                        }
-                        if (value != _passwordController.text) {
-                          return 'Passwords do not match';
                         }
                         return null;
                       },

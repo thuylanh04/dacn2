@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/auth_provider.dart';
+import 'security_screen.dart';
+import 'settings_screen.dart';
+import 'help_screen.dart';
 
-class ProfileScreen extends StatefulWidget {
+class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
 
   @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
+  ConsumerState<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   bool isEditing = false;
 
   @override
@@ -22,11 +27,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back),
-                    onPressed: () {},
-                    color: Colors.black,
-                  ),
+                  isEditing
+                      ? IconButton(
+                          icon: const Icon(Icons.arrow_back),
+                          onPressed: () {
+                            setState(() {
+                              isEditing = false;
+                            });
+                          },
+                          color: Colors.black,
+                        )
+                      : const SizedBox(width: 48),
                   Text(
                     isEditing ? 'Edit My Profile' : 'Profile',
                     style: const TextStyle(
@@ -121,10 +132,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             });
                           },
                         ),
-                        _buildProfileMenuItem('Security', Icons.shield, () {}),
-                        _buildProfileMenuItem('Setting', Icons.settings, () {}),
-                        _buildProfileMenuItem('Help', Icons.help, () {}),
-                        _buildProfileMenuItem('Logout', Icons.exit_to_app, () {}),
+                        _buildProfileMenuItem('Security', Icons.shield, () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(builder: (_) => const SecurityScreen()),
+                          );
+                        }),
+                        _buildProfileMenuItem('Setting', Icons.settings, () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(builder: (_) => const SettingsScreen()),
+                          );
+                        }),
+                        _buildProfileMenuItem('Help', Icons.help, () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(builder: (_) => const HelpScreen()),
+                          );
+                        }),
+                        _buildProfileMenuItem('Logout', Icons.exit_to_app, () {
+                          _confirmLogout(context);
+                        }),
                       ] else ...[
                         _buildEditForm(),
                         const SizedBox(height: 20),
@@ -283,6 +308,66 @@ class _ProfileScreenState extends State<ProfileScreen> {
           activeColor: const Color(0xFF1FD4A1),
         ),
       ],
+    );
+  }
+
+  void _confirmLogout(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (ctx) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'End Session',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                'Are you sure you want to log out?',
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    // Clear auth state (API-ready)
+                    ref.read(authProvider.notifier).logout();
+                    Navigator.of(ctx).pop();
+                    // Pop to root of current navigator
+                    Navigator.of(context).popUntil((route) => route.isFirst);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF14C996),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                  child: const Text('Yes, End Session', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                ),
+              ),
+              const SizedBox(height: 8),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton(
+                  onPressed: () => Navigator.of(ctx).pop(),
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide.none,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                  ),
+                  child: const Text('Cancel', style: TextStyle(color: Colors.black)),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

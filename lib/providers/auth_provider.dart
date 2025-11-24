@@ -1,35 +1,52 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/user_model.dart';
+import '../repositories/auth_repository.dart';
+import 'repository_providers.dart';
 
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>(
-  (ref) => AuthNotifier(),
+  (ref) {
+    final repo = ref.read(authRepositoryProvider);
+    return AuthNotifier(repo);
+  },
 );
 
 class AuthNotifier extends StateNotifier<AuthState> {
-  AuthNotifier() : super(const AuthState());
+  final AuthRepository _repository;
 
-  void signup(String fullName, String email, String phone, String dob, String password) {
-    // Simulate API call
-    final user = User(
-      id: '1',
-      fullName: fullName,
-      email: email,
-      mobileNumber: phone,
-      dateOfBirth: dob,
-    );
-    state = state.copyWith(user: user, isLoading: false);
+  AuthNotifier(this._repository) : super(const AuthState());
+
+  Future<void> signup(String email, String dob, String password) async {
+    state = state.copyWith(isLoading: true, error: null);
+    try {
+      await _repository.signup(email, dob, password);
+      final user = User(
+        id: '1',
+        fullName: '',
+        email: email,
+        mobileNumber: '',
+        dateOfBirth: dob,
+      );
+      state = state.copyWith(user: user, isLoading: false);
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+    }
   }
 
-  void login(String email, String password) {
-    // Simulate API call
-    final user = User(
-      id: '1',
-      fullName: 'John Doe',
-      email: email,
-      mobileNumber: '+1234567890',
-      dateOfBirth: '01/01/1990',
-    );
-    state = state.copyWith(user: user, isLoading: false);
+  Future<void> login(String email, String password) async {
+    state = state.copyWith(isLoading: true, error: null);
+    try {
+      await _repository.login(email, password);
+      final user = User(
+        id: '1',
+        fullName: '',
+        email: email,
+        mobileNumber: '',
+        dateOfBirth: '',
+      );
+      state = state.copyWith(user: user, isLoading: false);
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+    }
   }
 
   void setLoading(bool isLoading) {
